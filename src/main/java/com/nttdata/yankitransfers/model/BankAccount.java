@@ -17,7 +17,7 @@ public class BankAccount {
     private String numberAccount; //NúmeroDeCuenta
     private String idCustomer; //Id del cliente
     private String codProfile; //Codigo de perfil del cliente
-    private Float balance; //Saldo
+    private Double balance; //Saldo
     private Date date;
     private Boolean status;
 }

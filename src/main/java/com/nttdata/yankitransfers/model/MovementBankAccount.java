@@ -13,7 +13,7 @@ public class MovementBankAccount {
 
     private String id;
     private String description;
-    private Float amount;
+    private Double amount;
     private Date date;
     private Boolean status;
     private String numberAccount;

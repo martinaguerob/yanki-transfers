@@ -12,9 +12,8 @@ import java.util.Date;
 public class YankiPurse {
 
     private String id;
-    private Float balance;
+    private Double balance;
     private String numberAccount;
     private Date createdAt;
     private Boolean status;
-
 }

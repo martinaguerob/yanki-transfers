@@ -17,7 +17,7 @@ public class YankiTransfers {
     private String id;
     private String sourceCelphone;
     private String destinationCelphone;
-    private Float amount;
+    private Double amount;
     private String comment;
     @DateTimeFormat(pattern = "yyyy-mm-dd")
     private Date createdAt;

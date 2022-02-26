@@ -65,7 +65,7 @@ public class YankiTransfersServiceImpl implements YankiTransfersService {
                 .filter(yp -> yp.getBalance() >= entity.getAmount())
                 .flatMap(y -> {
                     //Actualizar saldo de Yanki purse
-                    Float balanceSource = sub.calcular(entity.getAmount(), y.getBalance());
+                    Double balanceSource = sub.calcular(entity.getAmount(), y.getBalance());
                     y.setBalance(balanceSource);
                     webClientConfig.updateYankiPurse(y, y.getId());
 
@@ -98,7 +98,7 @@ public class YankiTransfersServiceImpl implements YankiTransfersService {
                 .filter(ba -> ba.getBalance() >= entity.getAmount())
                 .flatMap(b -> {
                     //Actualizar saldo en banco
-                    Float balanceSource = sub.calcular(entity.getAmount(), b.getBalance());
+                    Double balanceSource = sub.calcular(entity.getAmount(), b.getBalance());
                     b.setBalance(balanceSource);
                     webClientConfig.updateBankAccount(b, b.getId()).subscribe();
 
@@ -118,7 +118,7 @@ public class YankiTransfersServiceImpl implements YankiTransfersService {
                 });
     }
 
-    public Mono<BankAccount> destinationBankTransfer(String numberAccount, Float amount){
+    public Mono<BankAccount> destinationBankTransfer(String numberAccount, Double amount){
         //Formulas de actualización de saldos
         Calculate sum = ((monto, saldo) -> saldo + monto);
 
@@ -130,13 +130,13 @@ public class YankiTransfersServiceImpl implements YankiTransfersService {
                     this.saveMovementAccount(ba.getNumberAccount(), amount, description).subscribe();
 
                     //Actualizar cuenta bancaria
-                    Float balanceDestination = sum.calcular(amount, ba.getBalance());
+                    Double balanceDestination = sum.calcular(amount, ba.getBalance());
                     ba.setBalance(balanceDestination);
                     return webClientConfig.updateBankAccount(ba, ba.getId());
                 });
     }
 
-    public Mono<YankiPurse> destinationYankiTransfer(String numberAccount, Float amount){
+    public Mono<YankiPurse> destinationYankiTransfer(String numberAccount, Double amount){
         //Formulas de actualización de saldos
         Calculate sum = ((monto, saldo) -> saldo + monto);
 
@@ -145,13 +145,13 @@ public class YankiTransfersServiceImpl implements YankiTransfersService {
         return yankiPurse
                 .flatMap(yp -> {
                     //Actualizar monedero
-                    Float balanceDestination = sum.calcular(amount, yp.getBalance());
+                    Double balanceDestination = sum.calcular(amount, yp.getBalance());
                     yp.setBalance(balanceDestination);
                     return webClientConfig.updateYankiPurse(yp, yp.getId());
                 });
     }
 
-    public Mono<MovementBankAccount> saveMovementAccount(String numberAccount, Float amount, String description) {
+    public Mono<MovementBankAccount> saveMovementAccount(String numberAccount, Double amount, String description) {
         MovementBankAccount movementBankAccount = new MovementBankAccount();
         movementBankAccount.setAmount(amount);
         movementBankAccount.setDescription(description);
