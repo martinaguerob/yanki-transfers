@@ -25,7 +25,7 @@ public class WebClientConfig {
     public Mono<YankiPurse> getYankiPurseByNumberAccount(@PathVariable String numberAccount){
         return webClientBuilder.build()
                 .get()
-                .uri("http://localhost:8080/purse/number/"+numberAccount)
+                .uri("http://localhost:8080/yanki-purse/number/"+numberAccount)
                 .retrieve()
                 .bodyToMono(YankiPurse.class);
     }
@@ -34,7 +34,7 @@ public class WebClientConfig {
         System.out.println("Se llegó a updateYankiPurse");
         return webClientBuilder.build()
                 .put()
-                .uri("http://localhost:8080/purse/update/"+id)
+                .uri("http://localhost:8080/yanki-purse/update/"+id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(yankiPurse))
                 .retrieve()

@@ -37,21 +37,16 @@ public class YankiTransfersServiceImpl implements YankiTransfersService {
         Mono<YankiAccount> sourceYankiAccount = webClientConfig.getYankiAccountByNumberCelphone(entity.getSourceCelphone());
         return sourceYankiAccount
                 .flatMap(s ->
-                        {
-                            Mono<YankiAccount> destinationYankiAccount = webClientConfig.getYankiAccountByNumberCelphone(entity.getDestinationCelphone());
-                            return destinationYankiAccount
-                                    .flatMap(d->
-                                            s.getTypeAccount().equals("Yanki")
-                                                    ? yankiTransfer(entity, s.getNumberAccount())
-                                                    : bankTransfer(entity, s.getNumberAccount())
-                                    );
-                        }
+                        s.getTypeAccount().equals("yanki purse")
+                                ? yankiTransfer(entity, s.getNumberAccount())
+                                : bankTransfer(entity, s.getNumberAccount())
                 );
 
     }
 
     public Mono<YankiTransfers> yankiTransfer(YankiTransfers entity, String numberAccount){
         //Transferencia desde monedero
+        System.out.println("Transferencia desde monedero");
 
         //Cuentas Yanki: origen y destino
         Mono<YankiAccount> sourceYankiAccount = webClientConfig.getYankiAccountByNumberCelphone(entity.getSourceCelphone());
@@ -72,7 +67,7 @@ public class YankiTransfersServiceImpl implements YankiTransfersService {
                     //Actualizar en destino
                     destinationYankiAccount
                             .flatMap(d ->
-                                    d.getTypeAccount().equals("Yanki")
+                                    d.getTypeAccount().equals("yanki purse")
                                             ? destinationYankiTransfer(d.getNumberAccount(), entity.getAmount())
                                             : destinationBankTransfer(d.getNumberAccount(), entity.getAmount())
                             ).subscribe();
@@ -85,6 +80,7 @@ public class YankiTransfersServiceImpl implements YankiTransfersService {
     public Mono<YankiTransfers> bankTransfer(YankiTransfers entity, String numberAccount){
         //Transderencia desde una cuenta bancaria
 
+        System.out.println("Transferencia desde cuenta bancaria");
         //Cuentas Yanki: origen y destino
         Mono<YankiAccount> sourceYankiAccount = webClientConfig.getYankiAccountByNumberCelphone(entity.getSourceCelphone());
         Mono<YankiAccount> destinationYankiAccount = webClientConfig.getYankiAccountByNumberCelphone(entity.getDestinationCelphone());
@@ -98,18 +94,19 @@ public class YankiTransfersServiceImpl implements YankiTransfersService {
                 .filter(ba -> ba.getBalance() >= entity.getAmount())
                 .flatMap(b -> {
                     //Actualizar saldo en banco
+                    System.out.println("Ingresó a  ver la cuenta del banco");
                     Double balanceSource = sub.calcular(entity.getAmount(), b.getBalance());
                     b.setBalance(balanceSource);
                     webClientConfig.updateBankAccount(b, b.getId()).subscribe();
 
                     //Guardar movimiento
                     String description = "Transferencia Yanki";
-                    this.saveMovementAccount(b.getNumberAccount(), entity.getAmount(), description).subscribe();
+                    this.saveMovementAccount(b.getNumberAccount(), entity.getAmount()*-1, description).subscribe();
 
                     //Actualizar en destino
                     destinationYankiAccount
                             .flatMap(d ->
-                                            d.getTypeAccount().equals("Yanki")
+                                            d.getTypeAccount().equals("yanki purse")
                                                     ? destinationYankiTransfer(d.getNumberAccount(), entity.getAmount())
                                                     : destinationBankTransfer(d.getNumberAccount(), entity.getAmount())
                                     ).subscribe();
